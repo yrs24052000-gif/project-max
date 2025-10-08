@@ -3,10 +3,12 @@ import { Search, Filter, Send, MessageSquare, ChevronLeft, ChevronRight, Eye, Ar
 import { mockQuotes, Quote } from '../data/mockData';
 import { ViewMoreModal } from '../components/ViewMoreModal';
 import { CustomMessageModal } from '../components/CustomMessageModal';
+import { useToast } from '../contexts/ToastContext';
 
 const ITEMS_PER_PAGE = 10;
 
 export function ColdQuotes() {
+  const { showToast } = useToast();
   const [quotes, setQuotes] = useState<Quote[]>(mockQuotes);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedQuotes, setSelectedQuotes] = useState<Set<string>>(new Set());
@@ -54,21 +56,21 @@ export function ColdQuotes() {
 
   const handleSendFollowUp = () => {
     if (selectedQuotes.size === 0) {
-      alert('Please select at least one quote');
+      showToast('Please select at least one quote', 'warning');
       return;
     }
-    alert(`Standard follow-up sent for ${selectedQuotes.size} quotes`);
+    showToast(`Standard follow-up sent for ${selectedQuotes.size} quotes`, 'success');
     setSelectedQuotes(new Set());
   };
 
   const handleSendCustomMessage = (message: string) => {
-    alert(`Custom message sent to ${selectedQuotes.size} quotes: "${message}"`);
+    showToast(`Custom message sent to ${selectedQuotes.size} quotes`, 'success');
     setSelectedQuotes(new Set());
   };
 
   const handleMoveToActive = () => {
     if (selectedQuotes.size === 0) {
-      alert('Please select at least one quote');
+      showToast('Please select at least one quote', 'warning');
       return;
     }
     const updatedQuotes = quotes.map(q =>
@@ -76,12 +78,12 @@ export function ColdQuotes() {
     );
     setQuotes(updatedQuotes);
     setSelectedQuotes(new Set());
-    alert(`${selectedQuotes.size} quotes moved to Active Quotes`);
+    showToast(`${selectedQuotes.size} quotes moved to Active Quotes`, 'success');
   };
 
   const handleDelete = () => {
     if (selectedQuotes.size === 0) {
-      alert('Please select at least one quote');
+      showToast('Please select at least one quote', 'warning');
       return;
     }
     const confirmed = confirm(`Are you sure you want to permanently delete ${selectedQuotes.size} quote(s)? This action cannot be undone.`);
@@ -89,7 +91,7 @@ export function ColdQuotes() {
       const updatedQuotes = quotes.filter(q => !selectedQuotes.has(q.id));
       setQuotes(updatedQuotes);
       setSelectedQuotes(new Set());
-      alert(`${selectedQuotes.size} quotes permanently deleted`);
+      showToast(`${selectedQuotes.size} quotes permanently deleted`, 'success');
     }
   };
 

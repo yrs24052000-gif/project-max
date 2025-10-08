@@ -16,7 +16,7 @@ export function Meetings() {
   };
 
   const isUpcoming = (dateTime: string) => {
-    return new Date(dateTime) > new Date('2025-10-03');
+    return new Date(dateTime) > new Date('2025-10-08');
   };
 
   const filteredMeetings = useMemo(() => {
@@ -29,10 +29,10 @@ export function Meetings() {
       const matchesSearch =
         meeting.contactPerson.toLowerCase().includes(searchTerm.toLowerCase()) ||
         meeting.quoteId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        quote?.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        quote?.companyNames.some(name => name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         quote?.projectName.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesClient = selectedClient === 'all' || quote?.clientName === selectedClient;
+      const matchesClient = selectedClient === 'all' || quote?.companyNames.includes(selectedClient);
       const matchesUpcoming = !showUpcomingOnly || isUpcoming(meeting.dateTime);
 
       return matchesSearch && matchesClient && matchesUpcoming;
@@ -47,7 +47,7 @@ export function Meetings() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const clients = Array.from(new Set(mockQuotes.map(q => q.clientName)));
+  const clients = Array.from(new Set(mockQuotes.flatMap(q => q.companyNames)));
 
   const formatDateTime = (dateTime: string) => {
     const date = new Date(dateTime);
@@ -175,7 +175,7 @@ export function Meetings() {
                         {quote?.projectName || 'Unknown Project'}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {quote?.clientName || 'Unknown Client'}
+                        {quote?.companyNames.join(', ') || 'Unknown Client'}
                       </p>
                     </div>
                   </div>
@@ -233,7 +233,7 @@ export function Meetings() {
                         <div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Amount</p>
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            ${quote.amount.toLocaleString()}
+                            ${quote.totalValue.toLocaleString()}
                           </p>
                         </div>
                       </div>

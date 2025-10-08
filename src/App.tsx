@@ -1,73 +1,112 @@
 import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
-import { DashboardHome } from './pages/DashboardHome';
+import { SignIn } from './pages/SignIn';
+import { Dashboard } from './pages/Dashboard';
 import { ActiveQuotes } from './pages/ActiveQuotes';
 import { ColdQuotes } from './pages/ColdQuotes';
 import { Meetings } from './pages/Meetings';
-import { Reports } from './pages/Reports';
-import { Settings } from './pages/Settings';
-import { SignIn } from './pages/SignIn';
+import { UnderDevelopment } from './components/UnderDevelopment';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentPage, setCurrentPage] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const handleSignIn = () => {
-    setIsAuthenticated(true);
-  };
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <DashboardHome onNavigate={setCurrentPage} />;
-      case 'active-quotes':
-        return <ActiveQuotes />;
-      case 'cold-quotes':
-        return <ColdQuotes />;
-      case 'meetings':
-        return <Meetings />;
-      case 'reports':
-        return <Reports />;
-      case 'settings':
-        return <Settings />;
-      default:
-        return <DashboardHome onNavigate={setCurrentPage} />;
-    }
-  };
+function AppLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
     return (
-      <ThemeProvider>
-        <SignIn onSignIn={handleSignIn} />
-      </ThemeProvider>
+      <Routes>
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="*" element={<Navigate to="/sign-in" replace />} />
+      </Routes>
     );
   }
 
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-        <div className="flex">
-          <Sidebar
-            currentPage={currentPage}
-            onNavigate={setCurrentPage}
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-          />
+      <div className="flex pt-16">
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
 
-          <main className="flex-1 p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto">
-              {renderPage()}
-            </div>
-          </main>
-        </div>
+        <main className="flex-1 p-6 overflow-x-hidden">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/active-quotes"
+              element={
+                <ProtectedRoute>
+                  <ActiveQuotes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cold-quotes"
+              element={
+                <ProtectedRoute>
+                  <ColdQuotes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/meetings"
+              element={
+                <ProtectedRoute>
+                  <Meetings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute>
+                  <UnderDevelopment />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <UnderDevelopment />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
       </div>
-    </ThemeProvider>
+    </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <AppLayout />
+          </ToastProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </BrowserRouter>
+  );
+}

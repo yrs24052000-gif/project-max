@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Filter, Send, MessageSquare, ChevronLeft, ChevronRight, Eye, ArrowUp, Trash2 } from 'lucide-react';
+import { Search, Filter, Send, MessageSquare, ChevronLeft, ChevronRight, Eye, ArrowUp, Archive, Trash2 } from 'lucide-react';
 import { mockQuotes, Quote } from '../data/mockData';
 import { ViewMoreModal } from '../components/ViewMoreModal';
 import { CustomMessageModal } from '../components/CustomMessageModal';
@@ -16,11 +16,14 @@ export function ColdQuotes() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedQuoteForModal, setSelectedQuoteForModal] = useState<Quote | null>(null);
   const [showCustomMessageModal, setShowCustomMessageModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'cold' | 'archived'>('cold');
 
-  const coldQuotes = quotes.filter(q => q.isCold);
+  const coldQuotes = quotes.filter(q => q.isCold && !q.isArchived);
+  const archivedQuotes = quotes.filter(q => q.isArchived);
+  const displayQuotes = activeTab === 'cold' ? coldQuotes : archivedQuotes;
 
   const filteredQuotes = useMemo(() => {
-    return coldQuotes.filter(quote => {
+    return displayQuotes.filter(quote => {
       const matchesSearch =
         quote.companyNames.some(name => name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         quote.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -28,7 +31,7 @@ export function ColdQuotes() {
 
       return matchesSearch;
     });
-  }, [searchTerm, coldQuotes]);
+  }, [searchTerm, displayQuotes]);
 
   const totalPages = Math.ceil(filteredQuotes.length / ITEMS_PER_PAGE);
   const paginatedQuotes = filteredQuotes.slice(
@@ -74,11 +77,24 @@ export function ColdQuotes() {
       return;
     }
     const updatedQuotes = quotes.map(q =>
-      selectedQuotes.has(q.id) ? { ...q, isCold: false } : q
+      selectedQuotes.has(q.id) ? { ...q, isCold: false, isArchived: false } : q
     );
     setQuotes(updatedQuotes);
     setSelectedQuotes(new Set());
     showToast(`${selectedQuotes.size} quotes moved to Active Quotes`, 'success');
+  };
+
+  const handleArchive = () => {
+    if (selectedQuotes.size === 0) {
+      showToast('Please select at least one quote', 'warning');
+      return;
+    }
+    const updatedQuotes = quotes.map(q =>
+      selectedQuotes.has(q.id) ? { ...q, isArchived: true } : q
+    );
+    setQuotes(updatedQuotes);
+    setSelectedQuotes(new Set());
+    showToast(`${selectedQuotes.size} quotes archived`, 'success');
   };
 
   const handleDelete = () => {
@@ -106,6 +122,12 @@ export function ColdQuotes() {
     handleUpdateQuote(quoteId, { status: newStatus });
   };
 
+  const handleTabChange = (tab: 'cold' | 'archived') => {
+    setActiveTab(tab);
+    setSelectedQuotes(new Set());
+    setCurrentPage(1);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -114,6 +136,31 @@ export function ColdQuotes() {
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Expired quotes requiring re-engagement
           </p>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-lg">
+        <div className="flex gap-1 p-1">
+          <button
+            onClick={() => handleTabChange('cold')}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              activeTab === 'cold'
+                ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            Cold Quotes ({coldQuotes.length})
+          </button>
+          <button
+            onClick={() => handleTabChange('archived')}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              activeTab === 'archived'
+                ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+          >
+            Archived ({archivedQuotes.length})
+          </button>
         </div>
       </div>
 
@@ -136,40 +183,69 @@ export function ColdQuotes() {
       </div>
 
       {selectedQuotes.size > 0 && (
-        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+        <div className={`border rounded-lg p-4 ${
+          activeTab === 'cold'
+            ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+            : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+        }`}>
           <div className="flex items-center justify-between gap-4 flex-wrap">
-            <p className="text-sm font-medium text-orange-900 dark:text-orange-100">
+            <p className={`text-sm font-medium ${
+              activeTab === 'cold'
+                ? 'text-orange-900 dark:text-orange-100'
+                : 'text-gray-900 dark:text-gray-100'
+            }`}>
               {selectedQuotes.size} {selectedQuotes.size === 1 ? 'quote' : 'quotes'} selected
             </p>
             <div className="flex gap-2 flex-wrap">
-              <button
-                onClick={handleSendFollowUp}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
-              >
-                <Send className="w-4 h-4" />
-                Send Follow-up Now
-              </button>
-              <button
-                onClick={() => setShowCustomMessageModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors text-sm"
-              >
-                <MessageSquare className="w-4 h-4" />
-                Send Custom Message
-              </button>
-              <button
-                onClick={handleMoveToActive}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
-              >
-                <ArrowUp className="w-4 h-4" />
-                Move to Active Quotes
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors text-sm"
-              >
-                <Trash2 className="w-4 h-4" />
-                Permanently Delete
-              </button>
+              {activeTab === 'cold' ? (
+                <>
+                  <button
+                    onClick={handleSendFollowUp}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
+                  >
+                    <Send className="w-4 h-4" />
+                    Send Follow-up Now
+                  </button>
+                  <button
+                    onClick={() => setShowCustomMessageModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors text-sm"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Send Custom Message
+                  </button>
+                  <button
+                    onClick={handleMoveToActive}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                    Move to Active
+                  </button>
+                  <button
+                    onClick={handleArchive}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors text-sm"
+                  >
+                    <Archive className="w-4 h-4" />
+                    Archive
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleMoveToActive}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                    Move to Active
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors text-sm"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Permanently Delete
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -221,7 +297,11 @@ export function ColdQuotes() {
               {paginatedQuotes.map((quote) => (
                 <tr
                   key={quote.id}
-                  className="hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-colors"
+                  className={`transition-colors ${
+                    activeTab === 'cold'
+                      ? 'hover:bg-orange-50 dark:hover:bg-orange-900/10'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                  }`}
                 >
                   <td className="px-4 py-3">
                     <input
@@ -299,7 +379,9 @@ export function ColdQuotes() {
 
         {filteredQuotes.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No cold quotes found matching your criteria</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              {activeTab === 'cold' ? 'No cold quotes found' : 'No archived quotes found'}
+            </p>
           </div>
         )}
       </div>

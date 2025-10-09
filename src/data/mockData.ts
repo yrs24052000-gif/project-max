@@ -11,6 +11,7 @@ export interface Quote {
   automatedFollowupFrequency: 'Every 10 days' | 'Every 30 days' | 'Every 60 days' | 'Every 90 days' | 'Manual only';
   managerNotes: string;
   isCold: boolean;
+  isArchived: boolean;
   clientName?: string;
   lastFollowUp?: string;
   projectType?: string;
@@ -38,7 +39,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Client confirmed budget approval. Awaiting final technical specifications from engineering team. Expected decision timeline: 2 weeks.',
     automatedFollowupFrequency: 'Every 10 days',
     managerNotes: 'High priority client. Strong relationship with procurement manager.',
-    isCold: false
+    isCold: false,
+    isArchived: false
   },
   {
     id: 'Q-2025-002',
@@ -52,7 +54,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Purchase order in final approval stage. Client mentioned timeline of next week for PO release.',
     automatedFollowupFrequency: 'Every 10 days',
     managerNotes: 'Follow up on Wednesday for PO status.',
-    isCold: false
+    isCold: false,
+    isArchived: false
   },
   {
     id: 'Q-2025-003',
@@ -66,7 +69,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Initial interest expressed but no response to follow-up emails. Last contact mentioned budget constraints.',
     automatedFollowupFrequency: 'Every 60 days',
     managerNotes: 'Try different contact person. Project may be delayed.',
-    isCold: true
+    isCold: true,
+    isArchived: false
   },
   {
     id: 'Q-2025-004',
@@ -80,7 +84,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Requested additional technical documentation for internal review. Engineering team evaluating specs.',
     automatedFollowupFrequency: 'Every 10 days',
     managerNotes: 'Send technical specs by Friday.',
-    isCold: false
+    isCold: false,
+    isArchived: false
   },
   {
     id: 'Q-2025-005',
@@ -94,7 +99,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Client mentioned project on hold due to funding issues. No response to recent check-ins.',
     automatedFollowupFrequency: 'Every 90 days',
     managerNotes: 'Low priority. Check quarterly.',
-    isCold: true
+    isCold: true,
+    isArchived: false
   },
   {
     id: 'Q-2025-006',
@@ -108,7 +114,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Long-term project planned for Q2 2026. Client maintaining contact for planning purposes.',
     automatedFollowupFrequency: 'Every 60 days',
     managerNotes: 'Schedule quarterly check-ins. Good long-term prospect.',
-    isCold: false
+    isCold: false,
+    isArchived: false
   },
   {
     id: 'Q-2025-007',
@@ -122,7 +129,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Quote under review by facilities management. Meeting scheduled for next week to discuss implementation.',
     automatedFollowupFrequency: 'Every 10 days',
     managerNotes: 'Prepare presentation for upcoming meeting.',
-    isCold: false
+    isCold: false,
+    isArchived: false
   },
   {
     id: 'Q-2025-008',
@@ -136,7 +144,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'No response after initial quote submission. Multiple follow-up attempts made.',
     automatedFollowupFrequency: 'Manual only',
     managerNotes: 'Wait for client to reach out. Low priority.',
-    isCold: true
+    isCold: true,
+    isArchived: false
   },
   {
     id: 'Q-2025-009',
@@ -150,7 +159,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Client comparing multiple vendors. Price-sensitive project. Requested best and final pricing.',
     automatedFollowupFrequency: 'Every 30 days',
     managerNotes: 'Consider discount if necessary to win project.',
-    isCold: false
+    isCold: false,
+    isArchived: false
   },
   {
     id: 'Q-2025-010',
@@ -164,7 +174,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Verbal confirmation received. Waiting for formal PO. Expected within 5 business days.',
     automatedFollowupFrequency: 'Every 10 days',
     managerNotes: 'High confidence. Prepare for quick turnaround.',
-    isCold: false
+    isCold: false,
+    isArchived: false
   },
   {
     id: 'Q-2025-011',
@@ -178,7 +189,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Technical questions answered. Client working on internal approval process.',
     automatedFollowupFrequency: 'Every 10 days',
     managerNotes: 'Strong technical fit. Good rapport with engineer.',
-    isCold: false
+    isCold: false,
+    isArchived: false
   },
   {
     id: 'Q-2025-012',
@@ -192,7 +204,8 @@ export const mockQuotes: Quote[] = [
     summaryOfLastResponse: 'Initial discussion went well but no follow-through. Client may have chosen competitor.',
     automatedFollowupFrequency: 'Manual only',
     managerNotes: 'Likely lost. Keep on file for future opportunities.',
-    isCold: true
+    isCold: true,
+    isArchived: false
   }
 ];
 

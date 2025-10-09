@@ -49,7 +49,7 @@ export function SignIn() {
                 <LogIn className="w-8 h-8 text-white" />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">QuoteFlow</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Project Max</h1>
             <p className="text-gray-600 dark:text-gray-400">Sign in to your account</p>
           </div>
 

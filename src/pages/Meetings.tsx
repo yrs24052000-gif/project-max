@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Calendar, Clock, MapPin, User, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Search, Filter, ChevronLeft, ChevronRight, List, CalendarDays } from 'lucide-react';
 import { mockMeetings, mockQuotes } from '../data/mockData';
+import { MeetingsCalendar } from '../components/MeetingsCalendar';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -10,6 +11,7 @@ export function Meetings() {
   const [showUpcomingOnly, setShowUpcomingOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
 
   const getQuoteInfo = (quoteId: string) => {
     return mockQuotes.find(q => q.id === quoteId);
@@ -73,6 +75,30 @@ export function Meetings() {
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Upcoming client meetings and consultations
           </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode('list')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              viewMode === 'list'
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            <List className="w-4 h-4" />
+            List View
+          </button>
+          <button
+            onClick={() => setViewMode('calendar')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              viewMode === 'calendar'
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            <CalendarDays className="w-4 h-4" />
+            Calendar View
+          </button>
         </div>
       </div>
 
@@ -146,6 +172,12 @@ export function Meetings() {
         )}
       </div>
 
+      {viewMode === 'calendar' ? (
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <MeetingsCalendar meetings={filteredMeetings} />
+        </div>
+      ) : (
+        <>
       <div className="space-y-4">
         {paginatedMeetings.map(meeting => {
           const quote = getQuoteInfo(meeting.quoteId);
@@ -266,7 +298,7 @@ export function Meetings() {
         )}
       </div>
 
-      {totalPages > 1 && (
+      {totalPages > 1 && viewMode === 'list' && (
         <div className="flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
           <p className="text-sm text-gray-700 dark:text-gray-300">
             Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{' '}
@@ -308,6 +340,8 @@ export function Meetings() {
             </button>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );

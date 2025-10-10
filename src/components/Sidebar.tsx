@@ -96,7 +96,7 @@
 // }
 
 
-import { LayoutDashboard, FileText, Snowflake, Calendar, BarChart3, Settings, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, FileText, Snowflake, Calendar, BarChart3, Settings, X, ChevronLeft, ChevronRight, Mail, Plus } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
@@ -108,8 +108,10 @@ interface SidebarProps {
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
+  { id: 'emails', label: 'Emails', icon: Mail, path: '/emails' },
   { id: 'active-quotes', label: 'Active Quotes', icon: FileText, path: '/active-quotes' },
   { id: 'cold-quotes', label: 'Cold Quotes', icon: Snowflake, path: '/cold-quotes' },
+  // { id: 'create-quote', label: 'Create Quote', icon: Plus, path: '/create-quote' },
   { id: 'meetings', label: 'Meetings', icon: Calendar, path: '/meetings' },
   { id: 'reports', label: 'Reports', icon: BarChart3, path: '/reports' },
   { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' }
